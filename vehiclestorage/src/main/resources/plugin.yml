@@ -1,0 +1,6 @@
+name: VehicleStorage
+author: haveric
+main: haveric.vehicleStorage.VehicleStorage
+version: 1.0.0
+api-version: 1.13
+load: STARTUP
