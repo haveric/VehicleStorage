@@ -29,6 +29,8 @@ public class VehicleStorage extends JavaPlugin {
         getCommand("vehiclestorage").setExecutor(new DefaultCommand());
         getCommand("vehiclestoragereload").setExecutor(new ReloadCommand());
 
+        EntityListener.reload();
+
         reload(null);
     }
 
@@ -49,7 +51,8 @@ public class VehicleStorage extends JavaPlugin {
     public void reload(CommandSender sender) {
         MessageSender.init(Settings.getInstance().getColorConsole());
         Settings.getInstance().reload(sender);
-        EntityListener.reload();
+
+        Updater.init(this, 345001, Settings.getInstance().getUpdateCheckApiToken());
     }
 
     public static VehicleStorage getPlugin() {

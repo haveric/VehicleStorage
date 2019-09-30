@@ -22,6 +22,9 @@ public class Settings {
 
     private static final boolean COLOR_CONSOLE_DEFAULT = true;
     private static final boolean DESTROY_PLAYER_ONLY_DEFAULT = true;
+    private static final boolean UPDATE_CHECK_ENABLED_DEFAULT = true;
+    private static final int UPDATE_CHECK_FREQUENCY_DEFAULT = 6;
+    private static final String UPDATE_CHECK_APITOKEN_DEFAULT = "";
 
     protected Settings() {
         // Exists only to defeat instantiation.
@@ -95,6 +98,10 @@ public class Settings {
                 }
             }
         }
+
+        if (sender != null) {
+            MessageSender.getInstance().info("Settings updated.");
+        }
     }
 
     private static FileConfiguration loadYML(String fileName) {
@@ -116,5 +123,17 @@ public class Settings {
 
     public boolean getDestroyPlayerOnly() {
         return fileConfig.getBoolean("destroy-playeronly", DESTROY_PLAYER_ONLY_DEFAULT);
+    }
+
+    public boolean getUpdateCheckEnabled() {
+        return fileConfig.getBoolean("update-check.enabled", UPDATE_CHECK_ENABLED_DEFAULT);
+    }
+
+    public int getUpdateCheckFrequency() {
+        return Math.max(fileConfig.getInt("update-check.frequency", UPDATE_CHECK_FREQUENCY_DEFAULT), 0);
+    }
+
+    public String getUpdateCheckApiToken() {
+        return fileConfig.getString("update-check.apitoken", UPDATE_CHECK_APITOKEN_DEFAULT);
     }
 }

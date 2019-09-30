@@ -36,8 +36,6 @@ public class EntityInventories {
 
         if (size == 9 || size == 18 || size == 27 || size == 36 || size == 45 || size == 54) {
             entityInventory.setInventoryType(InventoryType.CHEST);
-        } else if (size == 25) {
-            entityInventory.setInventoryType(InventoryType.DROPPER);
         } else if (size == 5) {
             entityInventory.setInventoryType(InventoryType.HOPPER);
         } else {
@@ -61,6 +59,8 @@ public class EntityInventories {
     }
 
     public static void load() {
+        long start = System.currentTimeMillis();
+
         File dir = new File(VehicleStorage.getPlugin().getDataFolder() + File.separator + "save" + File.separator);
         if (!dir.exists()) {
             return;
@@ -82,9 +82,14 @@ public class EntityInventories {
                 }
             }
         }
+
+        MessageSender.getInstance().log("Loaded " + inventories.size() + " storages in " + ((System.currentTimeMillis() - start) / 1000.0) + " seconds");
     }
 
     public static void save() {
+        long start = System.currentTimeMillis();
+        MessageSender.getInstance().log("Saving " + inventories.size() + " storages...");
+
         for (Map.Entry<UUID, EntityInventory> entry : inventories.entrySet()) {
             entry.getValue().killChestVisual();
         }
@@ -131,5 +136,7 @@ public class EntityInventories {
                 MessageSender.getInstance().error(null, e, "Failed to create '" + file.getPath() + "' file!");
             }
         }
+
+        MessageSender.getInstance().log("Saved storages in " + ((System.currentTimeMillis() - start) / 1000.0) + " seconds");
     }
 }

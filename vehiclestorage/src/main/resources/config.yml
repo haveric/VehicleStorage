@@ -20,18 +20,24 @@ color-console: true
 #   default: false
 destroy-playeronly: false
 
+# Automatic update checker (no auto download)
+update-check:
+  enabled: true     # Enable/disable update checking. (default: true)
+  frequency: 6      # Check for updates each N hours, use 0 to check only at startup. (default: 6)
+  apitoken:         # api token. See https://authors.curseforge.com/knowledge-base/projects/529-api for creating a token for your server
+
 # Storage configurations
 # storages:
 #   boat:                           # Name of the storage
 #     entitytype: boat              # EntityType allowed to attach to, Recommended only for boat and minecart
 #     createitem: chest             # Material used to add storage to entity
 #     returnitems: chest            # Comma separated list of Materials returned when the entity is destroyed
-#     inventorysize: 27             # Size of the inventory, Values: 5, 9, 18, 25, 27, 36, 45, 54
+#     inventorysize: 27             # Size of the inventory, Values: 5, 9, 18, 27, 36, 45, 54
 #     displayitem: chest            # Material that will be displayed on the entity
 #     inventorytitle: Boat Storage  # Title shown for the inventory
 #
 # Permissions are based off of the name, in this example: boat
-#   vehiclestorage.create.boat      # ALlows user to create storage
+#   vehiclestorage.create.boat      # Allows user to create storage
 #   vehiclestorage.open.boat        # Allows user to open storage
 #   vehiclestorage.destroy.boat     # Allows user to destroy entity containing the storage
 storages:
