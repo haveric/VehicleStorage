@@ -1,8 +1,11 @@
 package haveric.vehicleStorage.data;
 
+import haveric.vehicleStorage.settings.Storage;
+import haveric.vehicleStorage.settings.Storages;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.configuration.serialization.SerializableAs;
@@ -26,11 +29,13 @@ public class EntityInventory implements ConfigurationSerializable {
     private UUID entityUUID = null;
     private List<ItemStack> items = null;
     private InventoryType inventoryType = null;
+    private String storageName = null;
 
     private static final String ID_ENTITY_UUID = "entityUUID";
     private static final String ID_ITEM = "item";
     private static final String ID_INVENTORY_TYPE = "inventorytype";
     private static final String ID_INVENTORY_SIZE = "inventorysize";
+    private static final String ID_STORAGE_NAME = "storagename";
 
     /**
      * dummy caller to initialize Serialization class
@@ -69,6 +74,11 @@ public class EntityInventory implements ConfigurationSerializable {
             if (obj instanceof String) {
                 inventoryType = InventoryType.valueOf((String) obj);
             }
+
+            obj = map.get(ID_STORAGE_NAME);
+            if (obj instanceof String) {
+                storageName = (String) obj;
+            }
         } catch (Throwable e) {
 
         }
@@ -86,7 +96,7 @@ public class EntityInventory implements ConfigurationSerializable {
         if (items != null) {
             for (int i = 0; i < items.size(); i++) {
                 ItemStack item = items.get(i);
-                if (item != null) {
+                if (item != null && item.getType() != Material.AIR) {
                     map.put(ID_ITEM + i, item.serialize());
                 }
             }
@@ -96,6 +106,10 @@ public class EntityInventory implements ConfigurationSerializable {
 
         if (inventoryType != null) {
             map.put(ID_INVENTORY_TYPE, inventoryType.toString());
+        }
+
+        if (storageName != null) {
+            map.put(ID_STORAGE_NAME, storageName);
         }
 
         return map;
@@ -139,12 +153,28 @@ public class EntityInventory implements ConfigurationSerializable {
         this.inventoryType = inventoryType;
     }
 
+    public String getStorageName() {
+        return storageName;
+    }
+
+    public void setStorageName(String storageName) {
+        this.storageName = storageName;
+    }
+
     public Inventory getInventory() {
         if (inventory == null) {
-            if (inventoryType == InventoryType.CHEST) {
-                inventory = Bukkit.createInventory(null, items.size());
+            String title;
+            Storage storage = Storages.getStorage(storageName);
+            if (storage == null) {
+                title = "Vehicle Storage";
             } else {
-                inventory = Bukkit.createInventory(null, inventoryType);
+                title = storage.getInventoryTitle();
+            }
+
+            if (inventoryType == InventoryType.CHEST) {
+                inventory = Bukkit.createInventory(null, items.size(), title);
+            } else {
+                inventory = Bukkit.createInventory(null, inventoryType, title);
             }
 
             ItemStack[] itemArray = new ItemStack[items.size()];
@@ -160,9 +190,34 @@ public class EntityInventory implements ConfigurationSerializable {
     public void updateChestVisualLocation() {
         Entity entity = Bukkit.getEntity(entityUUID);
         if (entity != null) {
+            Location entityLocation = entity.getLocation();
+            Location newLocation;
+            if (entity instanceof Boat) {
+                Vector entityVector = entityLocation.getDirection().normalize().multiply(-.95);
+                newLocation = entityLocation.clone().add(entityVector);
+                newLocation.setY(entityLocation.getY() - 1.2);
+
+            } else if (entity instanceof Minecart) {
+                Location cloneLocation = entityLocation.clone();
+                cloneLocation.setYaw(cloneLocation.getYaw() - 90);
+                Vector entityVector = cloneLocation.getDirection().normalize().multiply(-.6);
+
+                newLocation = entityLocation.clone().add(entityVector);
+                newLocation.setY(entityLocation.getY() - 1.2);
+                newLocation.setYaw(newLocation.getYaw() - 90);
+            } else {
+                newLocation = entityLocation.clone();
+            }
+
             if (chestVisual == null) {
-                chestVisual = (ArmorStand) entity.getWorld().spawnEntity(entity.getLocation(), EntityType.ARMOR_STAND);
-                chestVisual.setHelmet(new ItemStack(Material.CHEST));
+                chestVisual = (ArmorStand) entity.getWorld().spawnEntity(newLocation, EntityType.ARMOR_STAND);
+                Storage storage = Storages.getStorage(storageName);
+
+                if (storage == null) {
+                    chestVisual.setHelmet(new ItemStack(Material.CHEST));
+                } else {
+                    chestVisual.setHelmet(storage.getDisplayItem());
+                }
                 chestVisual.setVisible(false);
                 chestVisual.setGravity(false);
                 chestVisual.setAI(false);
@@ -171,39 +226,34 @@ public class EntityInventory implements ConfigurationSerializable {
                 chestVisual.setBasePlate(false);
             }
 
-            Location entityLocation = entity.getLocation();
-            if (entity instanceof Boat) {
-                Vector entityVector = entityLocation.getDirection().normalize().multiply(-.95);
-                Location newLocation = entityLocation.clone().add(entityVector);
-                newLocation.setY(entityLocation.getY() - 1.2);
-                chestVisual.teleport(newLocation);
-            } else if (entity instanceof Minecart) {
-                Location cloneLocation = entityLocation.clone();
-                cloneLocation.setYaw(cloneLocation.getYaw() - 90);
-                Vector entityVector = cloneLocation.getDirection().normalize().multiply(-.6);
-
-                Location newLocation = entityLocation.clone().add(entityVector);
-                newLocation.setY(entityLocation.getY() - 1.2);
-                newLocation.setYaw(newLocation.getYaw() - 90);
-                chestVisual.teleport(newLocation);
-            }
-
+            chestVisual.teleport(newLocation);
         }
     }
 
-    public void destroy(Location location) {
+    public void destroy(World world, Location location) {
         killChestVisual();
 
         convertInventoryToItems();
         for (ItemStack item : items) {
             if (item != null && item.getType() != Material.AIR) {
-                location.getWorld().dropItem(location, item.clone());
+                world.dropItem(location, item.clone());
             }
         }
-        location.getWorld().dropItem(location, new ItemStack(Material.CHEST));
 
-        inventory.clear();
-        inventory = null;
+        Storage storage = Storages.getStorage(storageName);
+        if (storage == null) {
+            world.dropItem(location, new ItemStack(Material.CHEST));
+        } else {
+            List<ItemStack> drops = storage.getReturnItems();
+            for (ItemStack drop : drops) {
+                world.dropItem(location, drop.clone());
+            }
+        }
+
+        if (inventory != null) {
+            inventory.clear();
+            inventory = null;
+        }
     }
 
     public void killChestVisual() {

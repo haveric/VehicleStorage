@@ -4,3 +4,21 @@ main: haveric.vehicleStorage.VehicleStorage
 version: 1.0.0
 api-version: 1.13
 load: STARTUP
+commands:
+  vehiclestorage:
+    description: plugin info
+    aliases: [vs]
+    usage: /<command>
+    permission: vehiclestorage.command.vehiclestorage
+  vehiclestoragereload:
+    description: reload VehicleStorage configs
+    aliases: [vsreload]
+    usage: /<command>
+    permission: vehiclestorage.command.reload
+permissions:
+  vehiclestorage.command.vehiclestorage:
+    description: Allows usage of default VehicleStorage command
+    default: true
+  vehiclestorage.command.reload:
+    description: Allows reloading configs
+    default: op

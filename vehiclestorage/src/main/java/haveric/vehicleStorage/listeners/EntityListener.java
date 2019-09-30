@@ -3,12 +3,12 @@ package haveric.vehicleStorage.listeners;
 import haveric.vehicleStorage.VehicleStorage;
 import haveric.vehicleStorage.data.EntityInventories;
 import haveric.vehicleStorage.data.EntityInventory;
+import haveric.vehicleStorage.settings.Settings;
+import haveric.vehicleStorage.settings.Storage;
+import haveric.vehicleStorage.settings.Storages;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -39,7 +39,7 @@ public class EntityListener implements Listener {
     public void entityInteract(PlayerInteractEntityEvent event) {
         Entity entity = event.getRightClicked();
 
-        if (entity instanceof Boat || entity.getType() == EntityType.MINECART) {
+        if (Storages.checkEntityType(entity.getType())) {
             Player player = event.getPlayer();
 
             if (player.isSneaking() && event.getHand() == EquipmentSlot.HAND) {
@@ -49,14 +49,20 @@ public class EntityListener implements Listener {
                 // No Inventory found
                 if (inventory == null) {
                     ItemStack holding = player.getInventory().getItemInMainHand();
-                    if (holding.getType() == Material.CHEST) {
-                        EntityInventories.create(entityUUID);
-                        if (!player.getGameMode().equals(GameMode.CREATIVE)) {
-                            holding.setAmount(holding.getAmount() - 1);
+                    Storage storage = Storages.getStorage(holding, entity.getType());
+
+                    if (storage != null) {
+                        if (player.hasPermission("vehiclestorage.create." + storage.getName())) {
+                            EntityInventories.create(entityUUID, storage);
+                            if (!player.getGameMode().equals(GameMode.CREATIVE)) {
+                                holding.setAmount(holding.getAmount() - 1);
+                            }
                         }
                     }
                 } else {
-                    player.openInventory(inventory.getInventory());
+                    if (player.hasPermission("vehiclestorage.open." + inventory.getStorageName())) {
+                        player.openInventory(inventory.getInventory());
+                    }
                 }
             }
         }
@@ -67,7 +73,7 @@ public class EntityListener implements Listener {
         Entity[] entities = event.getChunk().getEntities();
 
         for (Entity entity : entities) {
-            if (entity instanceof Boat || entity.getType() == EntityType.MINECART) {
+            if (Storages.checkEntityType(entity.getType())) {
                 EntityInventory inventory = EntityInventories.get(entity.getUniqueId());
                 if (inventory != null) {
                     inventory.updateChestVisualLocation();
@@ -79,7 +85,7 @@ public class EntityListener implements Listener {
     @EventHandler
     public void chunkUnload(EntityTeleportEvent event) {
         Entity entity = event.getEntity();
-        if (entity instanceof Boat || entity.getType() == EntityType.MINECART) {
+        if (Storages.checkEntityType(entity.getType())) {
             EntityInventory inventory = EntityInventories.get(entity.getUniqueId());
             if (inventory != null) {
                 inventory.killChestVisual();
@@ -90,7 +96,7 @@ public class EntityListener implements Listener {
     @EventHandler
     public void vehicleMove(VehicleMoveEvent event) {
         Entity entity = event.getVehicle();
-        if (entity instanceof Boat || entity.getType() == EntityType.MINECART) {
+        if (Storages.checkEntityType(entity.getType())) {
             EntityInventory inventory = EntityInventories.get(entity.getUniqueId());
             if (inventory != null) {
                 inventory.updateChestVisualLocation();
@@ -101,10 +107,22 @@ public class EntityListener implements Listener {
     @EventHandler
     public void vehicleDestroy(VehicleDestroyEvent event) {
         Entity entity = event.getVehicle();
-        if (entity instanceof Boat || entity.getType() == EntityType.MINECART) {
+        if (Storages.checkEntityType(entity.getType())) {
             EntityInventory inventory = EntityInventories.get(entity.getUniqueId());
             if (inventory != null) {
-                inventory.destroy(entity.getLocation());
+                Entity attacker = event.getAttacker();
+                if (attacker instanceof Player) {
+                    Player player = (Player) attacker;
+                    if (!player.hasPermission("vehiclestorage.destroy." + inventory.getStorageName())) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                } else if (Settings.getInstance().getDestroyPlayerOnly()) {
+                    event.setCancelled(true);
+                    return;
+                }
+
+                inventory.destroy(entity.getWorld(), entity.getLocation());
                 EntityInventories.remove(entity.getUniqueId());
             }
         }

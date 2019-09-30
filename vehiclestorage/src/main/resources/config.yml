@@ -1,0 +1,51 @@
+lastchanged: 1.0.0 # Please do not edit this value - it is used by the plugin to notify you when a newer version of this file is available
+#-------------------------------------------------------------------------------------------------------------------------
+# RecipeManager configuration
+# This file is for settings.
+#
+# For help/issues: https://dev.bukkit.org/projects/vehiclestorage
+#
+# References
+# EntityTypes: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
+# Materials: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+#-------------------------------------------------------------------------------------------------------------------------
+
+# Enable or disable colored log messages
+#   default true
+color-console: true
+
+# Determines whether non-player entities (Ex: TNT) can destroy VehicleStorage entities
+#   true: Only players with the destroy permission can destroy VehicleStorages
+#   false: TNT, Creepers, etc. can destroy VehicleStorages. Players still need the destroy permission
+#   default: false
+destroy-playeronly: false
+
+# Storage configurations
+# storages:
+#   boat:                           # Name of the storage
+#     entitytype: boat              # EntityType allowed to attach to, Recommended only for boat and minecart
+#     createitem: chest             # Material used to add storage to entity
+#     returnitems: chest            # Comma separated list of Materials returned when the entity is destroyed
+#     inventorysize: 27             # Size of the inventory, Values: 5, 9, 18, 25, 27, 36, 45, 54
+#     displayitem: chest            # Material that will be displayed on the entity
+#     inventorytitle: Boat Storage  # Title shown for the inventory
+#
+# Permissions are based off of the name, in this example: boat
+#   vehiclestorage.create.boat      # ALlows user to create storage
+#   vehiclestorage.open.boat        # Allows user to open storage
+#   vehiclestorage.destroy.boat     # Allows user to destroy entity containing the storage
+storages:
+  boat:
+    entitytype: boat
+    createitem: chest
+    returnitems: chest
+    inventorysize: 27
+    displayitem: chest
+    inventorytitle: Boat Storage
+  minecart:
+    entitytype: minecart
+    createitem: chest
+    returnitems: chest
+    inventorysize: 27
+    displayitem: chest
+    inventorytitle: Minecart Storage

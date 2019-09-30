@@ -2,6 +2,7 @@ package haveric.vehicleStorage.data;
 
 import haveric.vehicleStorage.VehicleStorage;
 import haveric.vehicleStorage.messages.MessageSender;
+import haveric.vehicleStorage.settings.Storage;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -28,15 +29,28 @@ public class EntityInventories {
         return inventories.get(uuid);
     }
 
-    public static void create(UUID uuid) {
+    public static void create(UUID uuid, Storage storage) {
         EntityInventory entityInventory = new EntityInventory();
         entityInventory.setEntityUUID(uuid);
-        entityInventory.setInventoryType(InventoryType.CHEST);
+        int size = storage.getInventorySize();
+
+        if (size == 9 || size == 18 || size == 27 || size == 36 || size == 45 || size == 54) {
+            entityInventory.setInventoryType(InventoryType.CHEST);
+        } else if (size == 25) {
+            entityInventory.setInventoryType(InventoryType.DROPPER);
+        } else if (size == 5) {
+            entityInventory.setInventoryType(InventoryType.HOPPER);
+        } else {
+            entityInventory.setInventoryType(InventoryType.CHEST);
+            size = 27;
+        }
+
         List<ItemStack> initialItems = new ArrayList<>();
-        for (int i = 0; i < 27; i++) {
+        for (int i = 0; i < size; i++) {
             initialItems.add(new ItemStack(Material.AIR));
         }
         entityInventory.setItems(initialItems);
+        entityInventory.setStorageName(storage.getName());
         entityInventory.updateChestVisualLocation();
 
         inventories.put(uuid, entityInventory);

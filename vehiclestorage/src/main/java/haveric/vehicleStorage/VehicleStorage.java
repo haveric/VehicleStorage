@@ -1,9 +1,14 @@
 package haveric.vehicleStorage;
 
+import haveric.vehicleStorage.commands.DefaultCommand;
+import haveric.vehicleStorage.commands.ReloadCommand;
 import haveric.vehicleStorage.data.EntityInventories;
 import haveric.vehicleStorage.data.EntityInventory;
 import haveric.vehicleStorage.listeners.EntityListener;
 import haveric.vehicleStorage.messages.MessageSender;
+import haveric.vehicleStorage.settings.Settings;
+import haveric.vehicleStorage.settings.Storages;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class VehicleStorage extends JavaPlugin {
@@ -16,11 +21,15 @@ public class VehicleStorage extends JavaPlugin {
 
         EntityInventory.init();
         EntityInventories.load();
+        Storages.init();
 
         entityListener = new EntityListener();
 
-        reload();
-        MessageSender.getInstance().info("Enableddddd");
+        // Register commands
+        getCommand("vehiclestorage").setExecutor(new DefaultCommand());
+        getCommand("vehiclestoragereload").setExecutor(new ReloadCommand());
+
+        reload(null);
     }
 
     @Override
@@ -32,10 +41,14 @@ public class VehicleStorage extends JavaPlugin {
             entityListener.clean();
         }
         entityListener = null;
+
+        Storages.clean();
+        Settings.clean();
     }
 
-    private void reload() {
-        MessageSender.init(true);
+    public void reload(CommandSender sender) {
+        MessageSender.init(Settings.getInstance().getColorConsole());
+        Settings.getInstance().reload(sender);
         EntityListener.reload();
     }
 
