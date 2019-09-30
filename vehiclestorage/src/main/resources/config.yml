@@ -40,6 +40,8 @@ update-check:
 #   vehiclestorage.create.boat      # Allows user to create storage
 #   vehiclestorage.open.boat        # Allows user to open storage
 #   vehiclestorage.destroy.boat     # Allows user to destroy entity containing the storage
+#
+# All permissions default to true
 storages:
   boat:
     entitytype: boat
