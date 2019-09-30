@@ -73,21 +73,47 @@ public class Settings {
 
                         if (value != null) {
                             if (argLower.equals("entitytype")) {
-                                storage.setEntityType(EntityType.valueOf(value.toUpperCase()));
+                                try {
+                                    storage.setEntityType(EntityType.valueOf(value.toUpperCase()));
+                                } catch (IllegalArgumentException e) {
+                                    MessageSender.getInstance().info("<yellow>WARNING: <reset>Invalid entity type: " + value + " for entitytype. Defaulting to boat. See reference links at the top of the config for valid names.");
+                                }
                             } else if (argLower.equals("createitem")) {
-                                storage.setCreateItem(new ItemStack(Material.valueOf(value.toUpperCase())));
+                                try {
+                                    storage.setCreateItem(new ItemStack(Material.valueOf(value.toUpperCase())));
+                                } catch (IllegalArgumentException e) {
+                                    MessageSender.getInstance().info("<yellow>WARNING: <reset>Invalid material: " + value + " for createitem. Defaulting to chest. See reference links at the top of the config for valid names.");
+                                }
                             } else if (argLower.equals("returnitems")) {
                                 List<ItemStack> items = new ArrayList<>();
                                 String[] split = value.split(",");
                                 for (String s : split) {
                                     String mat = s.trim().toUpperCase();
-                                    items.add(new ItemStack(Material.valueOf(mat)));
+                                    try {
+                                        items.add(new ItemStack(Material.valueOf(mat)));
+                                    } catch (IllegalArgumentException e) {
+                                        MessageSender.getInstance().info("<yellow>WARNING: <reset>Invalid material: " + mat + " for returnitems. Defaulting to chest. See reference links at the top of the config for valid names.");
+                                    }
                                 }
                                 storage.setReturnItems(items);
                             } else if (argLower.equals("inventorysize")) {
-                                storage.setInventorySize(Integer.parseInt(value));
+                                try {
+                                    int size = Integer.parseInt(value);
+
+                                    if (size != 5 && size != 9 && size != 18 && size != 27 && size != 36 && size != 45 && size != 54) {
+                                        size = 27;
+                                        MessageSender.getInstance().info("<yellow>WARNING: <reset>Invalid size: " + value + " for inventorysize. Defaulting to 27. Allowed values: 5, 9, 18, 27, 36, 45, 54");
+                                    }
+                                    storage.setInventorySize(size);
+                                } catch (NumberFormatException e) {
+                                    MessageSender.getInstance().info("<yellow>WARNING: <reset>Invalid number: " + value + " for inventorysize. Defaulting to 27.");
+                                }
                             } else if (argLower.equals("displayitem")) {
-                                storage.setDisplayItem(new ItemStack(Material.valueOf(value.toUpperCase())));
+                                try {
+                                    storage.setDisplayItem(new ItemStack(Material.valueOf(value.toUpperCase())));
+                                } catch (IllegalArgumentException e) {
+                                    MessageSender.getInstance().info("<yellow>WARNING: <reset>Invalid material: " + value + " for displayitem. Defaulting to chest. See reference links at the top of the config for valid names.");
+                                }
                             } else if (argLower.equals("inventorytitle")) {
                                 storage.setInventoryTitle(value);
                             }

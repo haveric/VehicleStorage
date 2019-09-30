@@ -1,8 +1,10 @@
 package haveric.vehicleStorage.settings;
 
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Storage {
@@ -15,7 +17,14 @@ public class Storage {
     private String inventoryTitle;
 
     public Storage() {
+        entityType = EntityType.BOAT;
+        createItem = new ItemStack(Material.CHEST);
+        returnItems = new ArrayList<>();
+        returnItems.add(new ItemStack(Material.CHEST));
 
+        inventorySize = 27;
+        displayItem = new ItemStack(Material.CHEST);
+        inventoryTitle = "Vehicle Storage";
     }
 
     public String getName() {
