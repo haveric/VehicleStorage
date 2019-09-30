@@ -16,6 +16,7 @@ import java.io.File;
 import java.util.*;
 
 public class EntityInventories {
+    private static final int DATA_VERSION = 1;
     private static final String SAVE_EXTENSION = ".entityinventory";
     private static Map<UUID, EntityInventory> inventories = new LinkedHashMap<>();
 
@@ -116,6 +117,7 @@ public class EntityInventories {
 
             FileConfiguration yml = new YamlConfiguration();
             yml.set("id", worldEntry.getKey().toString());
+            yml.set("version", DATA_VERSION);
 
             for (Map.Entry<UUID, EntityInventory> entry : worldEntry.getValue().entrySet()) {
                 yml.set("inventories." + entry.getKey(), entry.getValue());

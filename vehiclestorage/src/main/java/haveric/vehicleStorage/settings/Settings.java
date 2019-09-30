@@ -100,7 +100,7 @@ public class Settings {
         }
 
         if (sender != null) {
-            MessageSender.getInstance().info("Settings updated.");
+            MessageSender.getInstance().sendAndLog(sender, "Settings updated.");
         }
     }
 

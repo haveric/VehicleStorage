@@ -15,10 +15,18 @@ commands:
     aliases: [vsreload]
     usage: /<command>
     permission: vehiclestorage.command.reload
+  vehiclestorageupdate:
+    description: check for VehicleStorage updates
+    aliases: [vsupdate]
+    usage: /<command>
+    permission: vehiclestorage.command.update
 permissions:
   vehiclestorage.command.vehiclestorage:
     description: Allows usage of default VehicleStorage command
     default: true
   vehiclestorage.command.reload:
     description: Allows reloading configs
+    default: op
+  recipemanager.command.update:
+    description: Allows checking for updates
     default: op

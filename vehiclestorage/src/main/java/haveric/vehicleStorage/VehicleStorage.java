@@ -2,6 +2,7 @@ package haveric.vehicleStorage;
 
 import haveric.vehicleStorage.commands.DefaultCommand;
 import haveric.vehicleStorage.commands.ReloadCommand;
+import haveric.vehicleStorage.commands.UpdateCommand;
 import haveric.vehicleStorage.data.EntityInventories;
 import haveric.vehicleStorage.data.EntityInventory;
 import haveric.vehicleStorage.listeners.EntityListener;
@@ -28,6 +29,7 @@ public class VehicleStorage extends JavaPlugin {
         // Register commands
         getCommand("vehiclestorage").setExecutor(new DefaultCommand());
         getCommand("vehiclestoragereload").setExecutor(new ReloadCommand());
+        getCommand("vehiclestorageupdate").setExecutor(new UpdateCommand());
 
         EntityListener.reload();
 
