@@ -1,13 +1,13 @@
 package haveric.vehicleStorage;
 
+import com.google.gson.Gson;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import haveric.vehicleStorage.messages.MessageSender;
 import haveric.vehicleStorage.settings.Settings;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitTask;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,8 +37,7 @@ public class Updater {
     private static VehicleStorage plugin;
     private static String pluginName;
 
-    private static String latestVersion;
-    private static String latestLink;
+    private static FileDetails latestFile = null;
 
     private static BukkitTask task = null;
 
@@ -54,8 +53,6 @@ public class Updater {
         plugin = newPlugin;
         urlFiles = plugin.getDescription().getWebsite() + "files";
         pluginName = plugin.getDescription().getName();
-        latestVersion = null;
-        latestLink = null;
         projectID = newProjectID;
         apiToken = newApiToken;
         stop();
@@ -92,7 +89,7 @@ public class Updater {
     }
 
     public static String getLatestVersion() {
-        String latest = latestVersion;
+        String latest = latestFile.name;
         if (latest != null) {
             Matcher matcher = getMatcher(latest);
 
@@ -170,7 +167,7 @@ public class Updater {
     }
 
     public static String getLatestLink() {
-        return latestLink;
+        return latestFile.downloadUrl;
     }
 
     /**
@@ -195,26 +192,16 @@ public class Updater {
                 // Add the user-agent to identify the program
                 conn.addRequestProperty("User-Agent", pluginName + "/v" + getCurrentVersion() + " (by haveric)");
 
-                // Read the response of the query
-                // The response will be in a JSON format, so only reading one line is necessary.
+                // Read the response of the query and parse the array of files from the query's response
                 final BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                String response = reader.readLine();
+                FileDetails[] fileDetails = new Gson().fromJson(reader, FileDetails[].class);
 
-                // Parse the array of files from the query's response
-                JSONArray array = (JSONArray) JSONValue.parse(response);
-
-                if (array.size() > 0) {
+                if (fileDetails.length > 0) {
                     // Get the newest file's details
-                    JSONObject latest = (JSONObject) array.get(array.size() - 1);
-
-                    // Get the version's title
-                    latestVersion = (String) latest.get(API_NAME_VALUE);
-
-                    // Get the version's link
-                    latestLink = (String) latest.get(API_LINK_VALUE);
+                    latestFile = fileDetails[0];
                 }
 
-                if (latestVersion == null) {
+                if (latestFile.name == null) {
                     if (sender != null) { // send this message only if it's a requested update check
                         MessageSender.getInstance().sendAndLog(sender, "<red>Unable to check for updates, please check manually by visiting:<yellow> " + urlFiles);
                     } else {
@@ -235,7 +222,7 @@ public class Updater {
                             }
                         } else if (compare == -1) {
                             MessageSender.getInstance().sendAndLog(sender, "New version: <green>" + latest + "<reset>! You're using <yellow>" + currentVersion);
-                            MessageSender.getInstance().sendAndLog(sender, "Grab it at: <green>" + latestLink);
+                            MessageSender.getInstance().sendAndLog(sender, "Grab it at: <green>" + latestFile.downloadUrl);
                         } else if (compare == 1) {
                             MessageSender.getInstance().sendAndLog(sender, "<gray>You are using a newer version: <green>" + currentVersion + "<reset>. Latest on BukkitDev: <yellow>" + latest);
                         }
@@ -249,5 +236,16 @@ public class Updater {
                 MessageSender.getInstance().info("<red>There was an error while checking for updates");
             }
         }
+    }
+
+    private class FileDetails {
+
+        @SerializedName("downloadUrl")
+        @Expose
+        public String downloadUrl;
+        @SerializedName("name")
+        @Expose
+        public String name;
+
     }
 }
