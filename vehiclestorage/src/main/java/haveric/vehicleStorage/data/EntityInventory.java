@@ -161,6 +161,14 @@ public class EntityInventory implements ConfigurationSerializable {
         this.storageName = storageName;
     }
 
+    public UUID getChestVisualUUID() {
+        if (chestVisual == null) {
+            return null;
+        }
+
+        return chestVisual.getUniqueId();
+    }
+
     public Inventory getInventory() {
         if (inventory == null) {
             String title;

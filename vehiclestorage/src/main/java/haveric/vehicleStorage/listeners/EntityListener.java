@@ -8,12 +8,14 @@ import haveric.vehicleStorage.settings.Storage;
 import haveric.vehicleStorage.settings.Storages;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityTeleportEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
@@ -33,6 +35,17 @@ public class EntityListener implements Listener {
     public static void reload() {
         HandlerList.unregisterAll(VehicleStorage.getEntityListener());
         Bukkit.getPluginManager().registerEvents(VehicleStorage.getEntityListener(), VehicleStorage.getPlugin());
+    }
+
+    @EventHandler
+    public void armorStandInteract(PlayerInteractAtEntityEvent event) {
+        Entity entity = event.getRightClicked();
+
+        if (entity instanceof ArmorStand) {
+            if (EntityInventories.isEntityInventoryArmorStand(entity.getUniqueId())) {
+                event.setCancelled(true);
+            }
+        }
     }
 
     @EventHandler
