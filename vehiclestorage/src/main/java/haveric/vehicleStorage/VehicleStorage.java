@@ -23,6 +23,7 @@ public class VehicleStorage extends JavaPlugin {
         EntityInventory.init();
         EntityInventories.load();
         Storages.init();
+        Files.init();
 
         entityListener = new EntityListener();
 
@@ -53,6 +54,7 @@ public class VehicleStorage extends JavaPlugin {
     public void reload(CommandSender sender) {
         MessageSender.init(Settings.getInstance().getColorConsole());
         Settings.getInstance().reload(sender);
+        Files.reload(sender); // (re)generate info files if they do not exist
 
         Updater.init(this, 345001, Settings.getInstance().getUpdateCheckApiToken());
     }

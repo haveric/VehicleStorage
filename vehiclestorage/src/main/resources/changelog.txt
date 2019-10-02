@@ -1,0 +1,8 @@
+== Change log ==
+This file will be automatically overwritten when a new version is installed.
+
+=== v1.0.1 ===
+* FIX: Removed ability to interact with armor stands holding the visual chests
+
+=== v1.0.0 ===
+* Initial Release
