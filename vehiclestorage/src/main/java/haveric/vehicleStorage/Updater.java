@@ -198,7 +198,7 @@ public class Updater {
 
                 if (fileDetails.length > 0) {
                     // Get the newest file's details
-                    latestFile = fileDetails[0];
+                    latestFile = fileDetails[fileDetails.length - 1];
                 }
 
                 if (latestFile.name == null) {
