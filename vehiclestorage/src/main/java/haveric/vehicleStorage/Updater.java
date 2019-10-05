@@ -1,32 +1,34 @@
 package haveric.vehicleStorage;
 
-import haveric.vehicleStorage.messages.MessageSender;
-import haveric.vehicleStorage.settings.Settings;
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.scheduler.BukkitTask;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.scheduler.BukkitTask;
+
+import haveric.vehicleStorage.data.CurseForgeAPIData;
+import haveric.vehicleStorage.messages.MessageSender;
+import haveric.vehicleStorage.settings.Settings;
+
 public class Updater {
- // The project's unique ID
+
+    // The project's unique ID
     private static int projectID;
 
     // An optional API token to use, will be null if not submitted
     private static String apiToken;
-
-    // Keys for extracting file information from JSON response
-    private static final String API_NAME_VALUE = "name";
-    private static final String API_LINK_VALUE = "downloadUrl";
 
     // Static information for querying the API
     private static final String API_QUERY = "/servermods/files?projectIds=";
@@ -41,6 +43,9 @@ public class Updater {
     private static String latestLink;
 
     private static BukkitTask task = null;
+
+    // Shared JSON serializer / deserializer
+    private static Gson gson = new Gson();
 
     private Updater() { } // Private constructor for utility class
 
@@ -201,17 +206,18 @@ public class Updater {
                 String response = reader.readLine();
 
                 // Parse the array of files from the query's response
-                JSONArray array = (JSONArray) JSONValue.parse(response);
+                Type collectionType = new TypeToken<Collection<Integer>>(){}.getType();
+                ArrayList<CurseForgeAPIData> array = gson.fromJson(response, collectionType);
 
                 if (array.size() > 0) {
                     // Get the newest file's details
-                    JSONObject latest = (JSONObject) array.get(array.size() - 1);
+                    CurseForgeAPIData latest = array.get(array.size() - 1);
 
                     // Get the version's title
-                    latestVersion = (String) latest.get(API_NAME_VALUE);
+                    latestVersion = latest.getName();
 
                     // Get the version's link
-                    latestLink = (String) latest.get(API_LINK_VALUE);
+                    latestLink = latest.getDownloadUrl();
                 }
 
                 if (latestVersion == null) {
