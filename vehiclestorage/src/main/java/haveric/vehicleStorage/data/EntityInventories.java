@@ -142,17 +142,17 @@ public class EntityInventories {
         MessageSender.getInstance().log("Saved storages in " + ((System.currentTimeMillis() - start) / 1000.0) + " seconds");
     }
 
-    public static boolean isEntityInventoryArmorStand(UUID uuid) {
+    public static EntityInventory getEntityInventoryFromArmorStand(UUID uuid) {
         for (Map.Entry<UUID, EntityInventory> entry : inventories.entrySet()) {
             EntityInventory inventory = entry.getValue();
             UUID armorStandUUID = inventory.getChestVisualUUID();
             if (armorStandUUID != null) {
                 if (uuid.equals(armorStandUUID)) {
-                    return true;
+                    return inventory;
                 }
             }
         }
 
-        return false;
+        return null;
     }
 }

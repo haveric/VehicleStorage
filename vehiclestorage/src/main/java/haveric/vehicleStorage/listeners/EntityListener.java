@@ -42,8 +42,14 @@ public class EntityListener implements Listener {
         Entity entity = event.getRightClicked();
 
         if (entity instanceof ArmorStand) {
-            if (EntityInventories.isEntityInventoryArmorStand(entity.getUniqueId())) {
+            EntityInventory inventory = EntityInventories.getEntityInventoryFromArmorStand(entity.getUniqueId());
+            if (inventory != null) {
                 event.setCancelled(true);
+
+                Player player = event.getPlayer();
+                if (player.hasPermission("vehiclestorage.open." + inventory.getStorageName())) {
+                    player.openInventory(inventory.getInventory());
+                }
             }
         }
     }

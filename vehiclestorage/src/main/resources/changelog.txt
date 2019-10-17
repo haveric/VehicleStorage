@@ -1,6 +1,9 @@
 == Change log ==
 This file will be automatically overwritten when a new version is installed.
 
+=== Coming Soon ===
+* NEW: Right clicking the (armor stand)chest will now also open the vehicle inventory
+
 === v1.0.1 ===
 * FIX: Removed ability to interact with armor stands holding the visual chests
 
