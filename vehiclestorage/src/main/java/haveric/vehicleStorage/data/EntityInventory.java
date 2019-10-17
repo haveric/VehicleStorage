@@ -23,6 +23,7 @@ public class EntityInventory implements ConfigurationSerializable {
         ConfigurationSerialization.registerClass(EntityInventory.class, "EntityInventory");
     }
 
+    private Location lastLocation = null;
     private Inventory inventory = null;
     private ArmorStand chestVisual = null;
 
@@ -204,7 +205,6 @@ public class EntityInventory implements ConfigurationSerializable {
                 Vector entityVector = entityLocation.getDirection().normalize().multiply(-.95);
                 newLocation = entityLocation.clone().add(entityVector);
                 newLocation.setY(entityLocation.getY() - 1.2);
-
             } else if (entity instanceof Minecart) {
                 Location cloneLocation = entityLocation.clone();
                 cloneLocation.setYaw(cloneLocation.getYaw() - 90);
@@ -216,6 +216,25 @@ public class EntityInventory implements ConfigurationSerializable {
             } else {
                 newLocation = entityLocation.clone();
             }
+
+            if (lastLocation != null) {
+                double factor = 4;
+                double x = entityLocation.getX() - lastLocation.getX();
+                double y = entityLocation.getY() - lastLocation.getY();
+                double z = entityLocation.getZ() - lastLocation.getZ();
+                float yaw = (float) ((entityLocation.getYaw() - lastLocation.getYaw()) * factor);
+                Vector dist = new Vector(x, y, z);
+                dist.multiply(factor);
+
+                if (entity instanceof Minecart) {
+                    newLocation.subtract(dist);
+                    newLocation.setYaw(newLocation.getYaw() - yaw);
+                } else {
+                    newLocation.add(dist);
+                    newLocation.setYaw(newLocation.getYaw() + yaw);
+                }
+            }
+            lastLocation = entityLocation;
 
             if (chestVisual == null) {
                 chestVisual = (ArmorStand) entity.getWorld().spawnEntity(newLocation, EntityType.ARMOR_STAND);
