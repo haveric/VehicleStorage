@@ -238,14 +238,12 @@ public class Updater {
         }
     }
 
-    private class FileDetails {
-
+    private static class FileDetails {
         @SerializedName("downloadUrl")
         @Expose
         public String downloadUrl;
         @SerializedName("name")
         @Expose
         public String name;
-
     }
 }
