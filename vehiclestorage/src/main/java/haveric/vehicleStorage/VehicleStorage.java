@@ -39,7 +39,7 @@ public class VehicleStorage extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        EntityInventories.save();
+        EntityInventories.save(true);
         EntityInventories.clean();
 
         if (entityListener != null) {

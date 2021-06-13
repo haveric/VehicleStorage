@@ -2,6 +2,7 @@ package haveric.vehicleStorage.data;
 
 import haveric.vehicleStorage.VehicleStorage;
 import haveric.vehicleStorage.messages.MessageSender;
+import haveric.vehicleStorage.settings.Settings;
 import haveric.vehicleStorage.settings.Storage;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -11,6 +12,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 import java.util.*;
@@ -18,12 +21,21 @@ import java.util.*;
 public class EntityInventories {
     private static final int DATA_VERSION = 1;
     private static final String SAVE_EXTENSION = ".entityinventory";
+
+    private static BukkitTask updateTask;
+    private static boolean needsUpdate = false;
+
     private static Map<UUID, EntityInventory> inventories = new LinkedHashMap<>();
 
     protected static void init() { }
 
     public static void clean() {
         inventories.clear();
+    }
+
+
+    public static void update() {
+        needsUpdate = true;
     }
 
     public static EntityInventory get(UUID uuid) {
@@ -53,10 +65,14 @@ public class EntityInventories {
         entityInventory.updateChestVisualLocation();
 
         inventories.put(uuid, entityInventory);
+
+        update();
     }
 
     public static void remove(UUID uuid) {
         inventories.remove(uuid);
+
+        update();
     }
 
     public static void load() {
@@ -84,15 +100,30 @@ public class EntityInventories {
             }
         }
 
+        if (updateTask != null) {
+            updateTask.cancel();
+        }
+
+        int saveFrequency = Settings.getInstance().getSaveFrequency();
+        updateTask = new BukkitRunnable() {
+            public void run() {
+                if (needsUpdate) {
+                    save(false);
+                }
+            }
+        }.runTaskTimer(VehicleStorage.getPlugin(), 0, saveFrequency);
+
         MessageSender.getInstance().log("Loaded " + inventories.size() + " storages in " + ((System.currentTimeMillis() - start) / 1000.0) + " seconds");
     }
 
-    public static void save() {
+    public static void save(boolean killEntities) {
         long start = System.currentTimeMillis();
         MessageSender.getInstance().log("Saving " + inventories.size() + " storages...");
 
-        for (Map.Entry<UUID, EntityInventory> entry : inventories.entrySet()) {
-            entry.getValue().killChestVisual();
+        if (killEntities) {
+            for (Map.Entry<UUID, EntityInventory> entry : inventories.entrySet()) {
+                entry.getValue().killChestVisual();
+            }
         }
 
         File dir = new File(VehicleStorage.getPlugin().getDataFolder() + File.separator + "save" + File.separator);
@@ -138,6 +169,9 @@ public class EntityInventories {
                 MessageSender.getInstance().error(null, e, "Failed to create '" + file.getPath() + "' file!");
             }
         }
+
+        // Reset needsUpdate
+        needsUpdate = false;
 
         MessageSender.getInstance().log("Saved storages in " + ((System.currentTimeMillis() - start) / 1000.0) + " seconds");
     }

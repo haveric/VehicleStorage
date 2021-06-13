@@ -18,12 +18,13 @@ public class Settings {
     private static FileConfiguration fileConfig;
     private static Settings instance;
     private static final String FILE_CONFIG = "config.yml";
-    private static final String LASTCHANGED_CONFIG = "1.0.0";
+    private static final String LASTCHANGED_CONFIG = "1.1.0";
 
     private static final boolean COLOR_CONSOLE_DEFAULT = true;
     private static final boolean DESTROY_PLAYER_ONLY_DEFAULT = true;
     private static final boolean UPDATE_CHECK_ENABLED_DEFAULT = true;
     private static final int UPDATE_CHECK_FREQUENCY_DEFAULT = 6;
+    private static final int SAVE_FREQUENCY_DEFAULT = 30;
     private static final String UPDATE_CHECK_APITOKEN_DEFAULT = "";
 
     protected Settings() {
@@ -55,7 +56,7 @@ public class Settings {
         String lastChanged = fileConfig.getString("lastchanged");
 
         if (!LASTCHANGED_CONFIG.equals(lastChanged)) {
-            MessageSender.getInstance().sendAndLog(sender, "<yellow>NOTE: <reset>'" + FILE_CONFIG + "' file is outdated, please delete it to allow it to be generated again.");
+            MessageSender.getInstance().sendAndLog(sender, "<yellow>NOTE: <reset>'" + FILE_CONFIG + "' file is outdated, please back it up and then delete it to allow it to be generated again.");
         }
 
         Storages.clean();
@@ -157,6 +158,11 @@ public class Settings {
 
     public int getUpdateCheckFrequency() {
         return Math.max(fileConfig.getInt("update-check.frequency", UPDATE_CHECK_FREQUENCY_DEFAULT), 0);
+    }
+
+    public int getSaveFrequency() {
+        int minutes = Math.max(fileConfig.getInt("save-frequency", SAVE_FREQUENCY_DEFAULT), 0);
+        return 1200 * minutes; // Convert to ticks: 20t * 60s * m
     }
 
     public String getUpdateCheckApiToken() {

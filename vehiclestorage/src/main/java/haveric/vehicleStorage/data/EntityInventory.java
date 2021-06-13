@@ -136,6 +136,8 @@ public class EntityInventory implements ConfigurationSerializable {
 
     public void setEntityUUID(UUID entityUUID) {
         this.entityUUID = entityUUID;
+
+        EntityInventories.update();
     }
 
     public List<ItemStack> getItems() {
@@ -144,6 +146,8 @@ public class EntityInventory implements ConfigurationSerializable {
 
     public void setItems(List<ItemStack> items) {
         this.items = items;
+
+        EntityInventories.update();
     }
 
     public InventoryType getInventoryType() {
@@ -152,6 +156,8 @@ public class EntityInventory implements ConfigurationSerializable {
 
     public void setInventoryType(InventoryType inventoryType) {
         this.inventoryType = inventoryType;
+
+        EntityInventories.update();
     }
 
     public String getStorageName() {
@@ -160,6 +166,8 @@ public class EntityInventory implements ConfigurationSerializable {
 
     public void setStorageName(String storageName) {
         this.storageName = storageName;
+
+        EntityInventories.update();
     }
 
     public UUID getChestVisualUUID() {
@@ -192,6 +200,8 @@ public class EntityInventory implements ConfigurationSerializable {
             }
             inventory.setContents(itemArray);
         }
+
+        EntityInventories.update();
 
         return inventory;
     }
@@ -281,6 +291,8 @@ public class EntityInventory implements ConfigurationSerializable {
             inventory.clear();
             inventory = null;
         }
+
+        EntityInventories.update();
     }
 
     public void killChestVisual() {
