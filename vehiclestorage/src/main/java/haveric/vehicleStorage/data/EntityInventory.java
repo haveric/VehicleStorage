@@ -11,6 +11,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.entity.*;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -250,10 +251,13 @@ public class EntityInventory implements ConfigurationSerializable {
                 chestVisual = (ArmorStand) entity.getWorld().spawnEntity(newLocation, EntityType.ARMOR_STAND);
                 Storage storage = Storages.getStorage(storageName);
 
-                if (storage == null) {
-                    chestVisual.setHelmet(new ItemStack(Material.CHEST));
-                } else {
-                    chestVisual.setHelmet(storage.getDisplayItem());
+                EntityEquipment equipment = chestVisual.getEquipment();
+                if (equipment != null) {
+                    if (storage == null) {
+                        equipment.setHelmet(new ItemStack(Material.CHEST));
+                    } else {
+                        equipment.setHelmet(storage.getDisplayItem());
+                    }
                 }
                 chestVisual.setVisible(false);
                 chestVisual.setGravity(false);

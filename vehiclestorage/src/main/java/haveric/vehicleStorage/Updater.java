@@ -18,7 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Updater {
- // The project's unique ID
+    // The project's unique ID
     private static int projectID;
 
     // An optional API token to use, will be null if not submitted
@@ -117,7 +117,7 @@ public class Updater {
      * @return compare<br>
      *  1: Current version is newer than the BukkitDev<br>
      *  0: Same version as BukkitDev<br>
-     * -1: BukkitDev is newer than current version
+     * -1: BukkitDev is newer than current version<br>
      * -2: Error occurred
      */
     public static int compareVersions() {
