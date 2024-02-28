@@ -184,7 +184,7 @@ public class Updater {
                 URLConnection conn = url.openConnection();
                 conn.setDoOutput(true);
 
-                if (apiToken != null && !apiToken.equals("")) {
+                if (apiToken != null && !apiToken.isEmpty()) {
                     // Add the API key to the request if present
                     conn.addRequestProperty("X-API-Token", apiToken);
                 }

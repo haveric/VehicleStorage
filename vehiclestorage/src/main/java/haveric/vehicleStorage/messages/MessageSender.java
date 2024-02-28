@@ -107,8 +107,7 @@ public class MessageSender {
 
         Collection<?> onlinePlayers = Bukkit.getOnlinePlayers();
         for (Object p : onlinePlayers) {
-            if (p instanceof Player) {
-                Player player = (Player) p;
+            if (p instanceof Player player) {
                 if (player.hasPermission("VehicleStorage.debugger")) {
                     send(player, message);
                 }
@@ -119,6 +118,6 @@ public class MessageSender {
     public void debug(String message) {
         StackTraceElement[] e = new Exception().getStackTrace();
         int i = 1;
-        Bukkit.getConsoleSender().sendMessage(MessageUtil.parseColors(ChatColor.GREEN + "[DEBUG]" + ChatColor.AQUA + "" + ChatColor.UNDERLINE + e[i].getFileName() + ":" + e[i].getLineNumber() + ChatColor.RESET + " " + ChatColor.RED + e[i].getMethodName() + "() " + ChatColor.WHITE + MessageUtil.parseColors(message, false), false));
+        Bukkit.getConsoleSender().sendMessage(MessageUtil.parseColors(ChatColor.GREEN + "[DEBUG]" + ChatColor.AQUA + ChatColor.UNDERLINE + e[i].getFileName() + ":" + e[i].getLineNumber() + ChatColor.RESET + " " + ChatColor.RED + e[i].getMethodName() + "() " + ChatColor.WHITE + MessageUtil.parseColors(message, false), false));
     }
 }

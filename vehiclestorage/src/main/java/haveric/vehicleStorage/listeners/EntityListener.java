@@ -130,8 +130,7 @@ public class EntityListener implements Listener {
             EntityInventory inventory = EntityInventories.get(entity.getUniqueId());
             if (inventory != null) {
                 Entity attacker = event.getAttacker();
-                if (attacker instanceof Player) {
-                    Player player = (Player) attacker;
+                if (attacker instanceof Player player) {
                     if (!player.hasPermission("vehiclestorage.destroy." + inventory.getStorageName())) {
                         event.setCancelled(true);
                         return;
